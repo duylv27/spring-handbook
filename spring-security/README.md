@@ -6,7 +6,7 @@
 - Visualize how your request go through **Spring Security** components.
 - Best practices for securing your Spring applications.
 
-## Basic Components
+## Basic Components, how we go from traditional way to Spring!
 
 ### Filter
 In Spring Security, the **Filter** is similar to the concept used in traditional Java web applications 
@@ -130,4 +130,85 @@ The more filters you need, the more configurations and management are required.
 Then Spring Security comes in, providing additional functionalities and support to streamline this process.
 
 ### DelegatingFilterProxy
-### SecurityFilterChain
+**_So what if we integrate these filters with Spring Framework as Spring Bean_** or 
+**_how can servlet filter be aware of Spring Bean?_** Then we have **DelegatingFilterProxy**.
+
+> Spring provides a Filter implementation named DelegatingFilterProxy that allows bridging between the Servlet container’s lifecycle and Spring’s ApplicationContext. The Servlet container allows registering Filter instances by using its own standards, but it is not aware of Spring-defined Beans. You can register DelegatingFilterProxy through the standard Servlet container mechanisms but delegate all the work to a Spring Bean that implements Filter.
+
+We can use `DelegatingFilterProxy` like this:
+```java
+@Bean
+public FilterRegistrationBean<DelegatingFilterProxy> authFilterRegistration() {
+    FilterRegistrationBean<DelegatingFilterProxy> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new DelegatingFilterProxy("authRequestFilter"));
+    registrationBean.addUrlPatterns("/*");
+    registrationBean.setOrder(0);
+    return registrationBean;
+}
+
+@Bean
+public FilterRegistrationBean<DelegatingFilterProxy> tenantFilterRegistration() {
+    FilterRegistrationBean<DelegatingFilterProxy> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new DelegatingFilterProxy("tenantFilter"));
+    registrationBean.addUrlPatterns("/*");
+    registrationBean.setOrder(1);
+    return registrationBean;
+}
+```
+In fact, **_the lower numbers order represent, the higher priority._**
+
+### FilterChainProxy and SecurityFilterChain
+From what we have with `DelegatingFilterProxy`, we know how to make servlet filter aware
+of Spring Bean. 
+
+However, **_do Spring provide other ways to manage filter bean better?_** Yes, we have **FilterChainProxy**, **SecurityFilterChain**.
+
+In case, we have a bunch of filters, let's think about **FilterChainProxy** is a special 
+**Filter** provided by Spring Security that allows delegating to many 
+**Filter** instances through SecurityFilterChain.
+Since **FilterChainProxy** is a Bean, it is typically wrapped in a **DelegatingFilterProxy**.
+
+Let's see below:
+```java
+public FilterChainProxy(SecurityFilterChain chain) {
+    this(Arrays.asList(chain));
+}
+
+public FilterChainProxy(List<SecurityFilterChain> filterChains) {
+    this.securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+    this.filterChainValidator = new NullFilterChainValidator();
+    this.firewall = new StrictHttpFirewall();
+    this.requestRejectedHandler = new HttpStatusRequestRejectedHandler();
+    this.throwableAnalyzer = new ThrowableAnalyzer();
+    this.filterChainDecorator = new VirtualFilterChainDecorator();
+    this.filterChains = filterChains;
+}
+```
+
+**_But what invoke above constructors?_** Actually, it's invoked when you create bean of **SecurityFilterChain** like:
+```java
+@Bean
+SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http
+            .authorizeHttpRequests(
+                    authorizeHttp -> {
+                        authorizeHttp.requestMatchers("/public/**").permitAll();
+                        authorizeHttp.anyRequest().authenticated();
+                    }
+            )
+            .httpBasic(withDefaults())
+            .build();
+}
+```
+Now, what we need to do is providing your security stuff to **SecurityFilterChain**. It will arrange your stuffs.
+- [Reference: Filter Chain](https://docs.spring.io/spring-security/site/docs/3.0.x/reference/security-filter-chain.html)
+
+### Handling Security Exceptions // TODO
+
+## Spring Security Time
+### Security Filter
+#### Filter
+
+### Authentication Components
+#### 1. Authentication Manager
+#### 2. Provider Manager
