@@ -210,5 +210,84 @@ Now, what we need to do is providing your security stuff to **SecurityFilterChai
 #### Filter
 
 ### Authentication Components
-#### 1. Authentication Manager
-#### 2. Provider Manager
+#### 1. SecurityContextHolder:
+When a request pass **Spring Security**, how can we know current user is authenticated or not? 
+We can get the `SecurityContextHolder` as it contains the details of who is authenticated.
+
+![img.png](img.png)
+
+The fastest way to get current user in **Spring Application** is:
+```Java
+Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+```
+It's expected to be saved once you complete the authentication (checking credentials, etc.), 
+and cleared after your request ends. But you don't need to care about how does it clear, 
+**Spring Security** will manage that, 
+you only need to handle setting `SecurityContextHolder` in some cases.
+
+By default, it uses `ThreadLocal` to store `SecurityContextHolder`.
+
+#### 2. Authentication
+According to Spring Security:
+>The Authentication interface serves two main purposes within Spring Security:
+>- An input to AuthenticationManager to provide the credentials a user has provided to authenticate. When used in this scenario, isAuthenticated() returns false.
+>- Represent the currently authenticated user. You can obtain the current Authentication from the SecurityContext.
+
+> The Authentication contains:
+>- principal: Identifies the user. When authenticating with a username/password this is often an instance of UserDetails.
+>- credentials: Often a password. In many cases, this is cleared after the user is authenticated, to ensure that it is not leaked.
+>- authorities: The GrantedAuthority instances are high-level permissions the user is granted. Two examples are roles and scopes.
+
+
+In short, what is:
+- Input for authentication.
+- Authenticated user.
+
+#### 3. GrantedAuthority
+When you have **Authentication**, you also have something called **Authentication**. 
+Then this one represent for user roles and will be used on 
+web authorization, method authorization, etc.
+
+#### 4. Authentication Manager, Provider Manager
+An interface, a skeleton for authentication work:
+```java
+public interface AuthenticationManager {
+    Authentication authenticate(Authentication authentication) throws AuthenticationException;
+}
+```
+Then there is thing called **ProviderManager** implement **AuthenticationManager**, 
+that will delegate all **AuthenticationProvider**.
+
+
+- **AuthenticationManager**: authentication skeleton `authentication(Authentication authentication)`.
+- **ProviderManager:** check and execute authentication implementation, called `AuthenticationProviders`.
+- **AuthenticationProvider**: where perform your authentication logic.
+```mermaid
+classDiagram
+    class AuthenticationManager {
+        <<interface>>
+        + authentication(auth: Authentication): Authentication
+    }
+
+    class ProviderManager {
+        + providers: List~AuthenticationProvider~
+        + authentication(auth: Authentication): Authentication
+    }
+
+    class AuthenticationProvider {
+        <<interface>>
+        + authenticate(auth: Authentication): Authentication
+        + supports(class: Class<?>) : boolean
+    }
+
+    AuthenticationManager <|-- ProviderManager
+    ProviderManager --> AuthenticationProvider
+```
+**Question:** If you have many providers, when doing authentication, do we execute all of them?
+
+No, when you create your own authentication provider, you need to define 2 things:
+1. `authenticate(auth)`: authentication logic.
+2. `supports(class)`: authentication type your provider support.
+
+That meant, _**all providers having same authentication input type will be executed together.**_
+### Authorization Components
