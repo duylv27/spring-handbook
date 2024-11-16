@@ -77,7 +77,7 @@ public class TenantFilter implements Filter {
 
 }
 ```
-[Reference: Adding a Custom Filter to the Filter Chain](https://docs.spring.io/spring-security/reference/servlet/architecture.html#adding-custom-filter)
+- [Reference: Adding a Custom Filter to the Filter Chain](https://docs.spring.io/spring-security/reference/servlet/architecture.html#adding-custom-filter)
 
 So, we have 2 filters `AuthRequestFilter`, and `TenantFilter`.
 
@@ -209,6 +209,19 @@ Now, what we need to do is providing your security stuff to **SecurityFilterChai
 ### Security Filter
 #### Filter
 
+---
+## Spring Security Keyword
+### Manager: 
+Working with Spring Security you will see many components named as 
+**XXX**Manager (AuthenticationManager, AuthorizationManager, etc.). 
+So what is this purpose? It will delegate all AuthenticationManager, 
+AuthorizationManager needed for your request.
+### Provider
+You will see this term in Security Authentication. When you have multiple 
+ways to authenticate your user, Provider will help you to delegate authentication for your user.
+
+---
+
 ### Authentication Components
 #### 1. SecurityContextHolder:
 When a request pass **Spring Security**, how can we know current user is authenticated or not? 
@@ -290,4 +303,49 @@ No, when you create your own authentication provider, you need to define 2 thing
 2. `supports(class)`: authentication type your provider support.
 
 That meant, _**all providers having same authentication input type will be executed together.**_
+
 ### Authorization Components
+#### AuthorizationManager
+
+It'll help you to manage all authorization aspects for your application like request based, method bases, etc.
+they are responsible for access control decision. So how is it structuring?
+```java
+default void verify(Supplier<Authentication> authentication, T object) {
+    AuthorizationDecision decision = this.check(authentication, object);
+    if (decision != null && !decision.isGranted()) {
+        throw new AccessDeniedException("Access Denied");
+    }
+}
+
+@Nullable
+AuthorizationDecision check(Supplier<Authentication> authentication, T object);
+```
+To authenticate, we need to know 2 things. First, User Authentication information, 
+second an object will be verified if user can process this object or not. 
+So with above structure, the `Supplier<Authentication> authentication` is 1st, and `T object` is 2nd.
+The 2nd can be anything, assume it's `MethodInvocation` you can get method parameter to check if current user can
+process them.
+
+After that we will have a `AuthorizationDecision` as authorization result, and by default it will process as below:
+```java
+AuthorizationDecision decision = this.check(authentication, object);
+if (decision != null && !decision.isGranted()) {
+    throw new AccessDeniedException("Access Denied");
+}
+```
+
+Common AuthorizationManager you may know is:
+- **RequestMatcherDelegatingAuthorizationManager**: for request path authorization.
+- **AuthorizationManagerBeforeMethodInterceptor**: for method authorization.
+  ![img_1.png](img_1.png)
+
+---
+## TODO:
+### Authentication
+1. Example for multiple authentication.
+2. Handling Security Exception.
+### Authorization
+1. Example for authentication provider.
+2. Hierarchical Roles
+
+
