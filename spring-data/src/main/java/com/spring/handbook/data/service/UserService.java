@@ -37,13 +37,25 @@ public class UserService {
         return new UserDTO(id, user.getFirstName(), user.getLastName(), null, null, addressDTO);
     }
 
+    /**
+     * Three EntityManagers will be created at #1, #3, #4
+     */
     public UserDTO updateInNonTransactionContext(Long id) {
-        var user = userRepository.findById(id).orElseThrow();
+        var user = userRepository.findById(id).orElseThrow(); // #1 Already include referenced entities
         user.setId(id);
         user.setFirstName(UUID.randomUUID().toString());
         user.setLastName(UUID.randomUUID().toString());
         var address = user.getAddress();
-        AddressDTO addressDTO = new AddressDTO(address.getId(), address.getValue()); // this will throw Lazy Exception
+        address.setValue(UUID.randomUUID().toString());
+        AddressDTO addressDTO = new AddressDTO(address.getId(), address.getValue()); // #2 this will throw Lazy Exception if #1 don't include any
+
+        // #3 get user
+        user = userRepository.findById(id).orElseThrow();
+        user.setFirstName(UUID.randomUUID().toString());
+        user.setLastName(UUID.randomUUID().toString());
+
+        // #4 save user
+        userRepository.save(user);
         return new UserDTO(id, user.getFirstName(), user.getLastName(), null, null, addressDTO);
     }
 
@@ -51,6 +63,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User saveThenGet() {
         var saveUser = this.saveUser();
         return getUserById(saveUser.getId());

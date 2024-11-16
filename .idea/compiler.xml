@@ -9,6 +9,7 @@
         <module name="app" />
         <module name="security" />
         <module name="data" />
+        <module name="kafka" />
       </profile>
     </annotationProcessing>
   </component>
@@ -16,6 +17,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="app" options="-parameters" />
       <module name="data" options="-parameters" />
+      <module name="kafka" options="-parameters" />
       <module name="security" options="-parameters" />
     </option>
   </component>

@@ -54,11 +54,6 @@ public class User {
                 this.address = address;
         }
 
-        @PostUpdate
-        public void test() {
-                System.out.println();
-        }
-
         // Getters and setters
         public Long getId() {
                 return id;
@@ -100,7 +95,6 @@ public class User {
                 this.posts = posts;
         }
 
-//        @Transactional
         public Address getAddress() {
                 return address;
         }

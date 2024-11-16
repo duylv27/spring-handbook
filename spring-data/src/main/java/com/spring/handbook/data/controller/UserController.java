@@ -35,4 +35,9 @@ public class UserController {
         return userService.update(id);
     }
 
+    @PutMapping("{id}/non-txn")
+    public UserDTO updateInNonTransactionContext(@PathVariable Long id) {
+        return userService.updateInNonTransactionContext(id);
+    }
+
 }

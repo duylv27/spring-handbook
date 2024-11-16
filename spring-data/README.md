@@ -1,12 +1,12 @@
 # Spring Data
-Apply this [Principle of least astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment), all fetch type
-should be LAZY
+Apply this [Principle of least astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment), all fetch type should be LAZY.
 ## Entity State
 
 ---
 
 ## Entity Relationship
-### One To One
+### 1-1: One To One
+![img_1.png](img_1.png)
 #### Fetch Type
 - Fetch Lazy for both side.
 - Apply **Share Key** for one-to-one relationship. See `@PrimaryKeyJoinColumn`, `@MapsId`.
@@ -15,6 +15,8 @@ fetch lazy will not work then we will get N+1 problem.
 
 After above setting up: when you try to get parent, child will not come together. If you want to get all of them let consider
 using `@EntityGrapths` with **JPA Query Method** to fetch the child with parent.
+
+**_Code_**
 ```java
 @Entity
 @Table(name = "app_user")
@@ -48,6 +50,45 @@ public class Address {
 ```
 - [The best way to use the JPA OneToOne optional attribute](https://vladmihalcea.com/best-way-onetoone-optional/)
 #### Cascade Type
+
+### 1-N: One To Many:
+![img_4.png](img_4.png)
+**_Code_**
+```java
+@Entity
+@Table(name = "app_user")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @PrimaryKeyJoinColumn
+    private Address address;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private Set<Post> posts;
+}
+
+@Entity
+@Table(name = "app_post")
+public class Post {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String content;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    private User user;
+
+}
+```
+
 
 
 
