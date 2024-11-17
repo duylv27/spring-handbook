@@ -1,6 +1,7 @@
 package com.spring.handbook.data.listener;
 
-import org.hibernate.event.spi.*;
+import org.hibernate.event.spi.PostUpdateEvent;
+import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
 public class UserListener implements PostUpdateEventListener {
