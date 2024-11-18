@@ -17,7 +17,42 @@ let's do that in your **repository** or **service**.
     logging.level.org.springframework.orm.jpa=DEBUG
     logging.level.org.springframework.transaction=DEBUG
     ```
+---
+
 ## Entity State
+
+Now, when interacting with data is easier, therefore we face many issues regarding entity state. However, we need to
+be aware of them, in case there are issues.
+
+![docs/entity-state.png](docs/entity-state.png)
+
+### New
+A newly created object that hasn’t ever been associated with a Hibernate Session.
+```java
+var user = new User();
+```
+
+### Persistent (Managed)
+A persistent entity has been associated with a database table row, and 
+it’s being managed by the current running Persistence Context. 
+Any change made to such entity is going to be detected and propagated to the database.
+```java
+var user = new User(1L, "admin");
+entityManager.persist(user);
+
+var firstUser = entityManager.find(User.class, 1L);
+```
+
+### Detached
+Once the current running Persistence Context is closed all the previously managed entities become detached.
+
+### Removed
+Although JPA demands that managed entities only are allowed to be removed, Hibernate can also delete detached entities
+(but only through a Session#delete method call).
+
+
+**_Reference:_**
+- https://vladmihalcea.com/a-beginners-guide-to-jpa-hibernate-entity-state-transitions/
 
 ---
 
@@ -66,9 +101,9 @@ public class Address {
 }
 ```
 - [The best way to use the JPA OneToOne optional attribute](https://vladmihalcea.com/best-way-onetoone-optional/)
-#### Cascade Type
+#### Cascade Type: TODO
 
-### 1-N: One To Many:
+### 1-N | N-1:
 ![img_4.png](docs/one-n.png)
 **_Code_**
 ```java
@@ -106,23 +141,81 @@ public class Post {
 }
 ```
 
+---
+## Note:
 
+### What is N+1 problem?
+> The N+1 problem arises in Hibernate due to the way lazy loading is implemented for associations between entities. When lazy loading is used, related entities are fetched from the database only when they are accessed for the first time.
 
+Working with database, we work with tables, and tables have their references.
+
+So **N+1** is something like, when you query for 10 records int **Table A** calls **listA**,
+when you access each item in **listA** system will call N query (N as number of A references) 
+to find the references of **Table A**.
+
+### Why lazy fetch must be in transactional context?
+When we set LAZY Fetch for any entity, associated entities will not come along with parent. Therefore,
+they need transaction context in case, you require associated entities.
+
+Below we have a method run without transaction context, then it will potentially throw `LazyInitializationException` when we try to get
+associated entities.
+```java
+/**
+ * Three EntityManagers will be created at #1, #3, #4
+ */
+public UserDTO updateInNonTransactionContext(Long id) {
+  var user = userRepository.findById(id).orElseThrow(); // #1
+  user.setId(id);
+  user.setFirstName(UUID.randomUUID().toString());
+  user.setLastName(UUID.randomUUID().toString());
+  var address = user.getAddress();
+  address.setValue(UUID.randomUUID().toString());
+  
+  // #2 this will throw Lazy Exception if #1 don't include any
+  AddressDTO addressDTO = new AddressDTO(address.getId(), address.getValue());
+  
+  // #3 get user
+  user = userRepository.findById(id).orElseThrow();
+  user.setFirstName(UUID.randomUUID().toString());
+  user.setLastName(UUID.randomUUID().toString());
+
+  // #4 save user
+  userRepository.save(user);
+  return new UserDTO(id, user.getFirstName(), user.getLastName(), null, null, addressDTO);
+}
+```
+
+### Why eager sometimes face **N+1** problem?
+We imagine that, using **EAGER LOADING** fetch referenced data, and get them 1 one query. 
+But the truth is they still execute many query to get referenced data.
+
+Let's say we have **1 record** in table `table_a` and **4 referenced records** in `referenced_table_a`, 
+then the eager loading will trigger as following:
+```
+1. select * from table_a;
+
+2. For each records from #1
+select * from referenced_table_a where id = ?
+select * from referenced_table_a where id = ?
+select * from referenced_table_a where id = ?
+select * from referenced_table_a where id = ?
+```
+
+To fix that, you need to use `JOIN FETCH`, then they will get them 1 one query.
+
+### Recommended
+- Consider Lazy for all, using `@EntityGraphs`, `FETCH JOIN`, or `JPA Query Method` to get associated entities.
 
 ---
+## Checklist
+### Smell
+- [ ] In your local development, let's turn the log on to verify your work with database.
+- [ ] Count your queries carefully, any redundant queries?
+- [ ] Count number of opening Entity Manager?
 
-## Persistence Type
-
----
-## Fetch Type
-### LAZY
-- Why lazy fetch must be in transactional context
-### EAGER
-- Why eager sometimes face **N+1** problem.
-### Best Practices
-- Consider Lazy for all, using `@EntityGraphs` or 
-`JPA Query Method` to get associated entities.
-
----
-## Best Practices
-### Understand entity state to optimize JPA functionalities.
+### Scan
+- [ ] Check default **Fetch Type** for each relationship annotation, do they make sense as your need?
+- [ ] If **Lazy Fetch**, use entity in transactional context.
+- [ ] If **Lazy Fetch**, then you want to get associated entities, please use `@EntityGraphs`, `FETCH JOIN`.
+- [ ] If **Lazy Fetch**, use entity in transactional context.
+- [ ] If **Eager Fetch**, use `FETCH JOIN` when getting data.

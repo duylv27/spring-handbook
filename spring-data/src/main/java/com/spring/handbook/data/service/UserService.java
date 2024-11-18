@@ -1,15 +1,12 @@
 package com.spring.handbook.data.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.handbook.data.dto.AddressDTO;
 import com.spring.handbook.data.dto.UserDTO;
 import com.spring.handbook.data.entity.Address;
 import com.spring.handbook.data.entity.User;
 import com.spring.handbook.data.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,13 +15,9 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PlatformTransactionManager transactionManager;
-    private final TransactionTemplate transactionTemplate;
 
-    public UserService(UserRepository userRepository, PlatformTransactionManager transactionManager) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.transactionManager = transactionManager;
-        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     @Transactional
@@ -41,7 +34,7 @@ public class UserService {
      * Three EntityManagers will be created at #1, #3, #4
      */
     public UserDTO updateInNonTransactionContext(Long id) {
-        var user = userRepository.findById(id).orElseThrow(); // #1 Already include referenced entities
+        var user = userRepository.findById(id).orElseThrow(); // #1
         user.setId(id);
         user.setFirstName(UUID.randomUUID().toString());
         user.setLastName(UUID.randomUUID().toString());
@@ -85,4 +78,5 @@ public class UserService {
     public User getUserById(Long userId) {
         return userRepository.getReferenceById(userId);
     }
+
 }
