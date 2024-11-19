@@ -3,12 +3,22 @@
 ## Table of contents
 
 ---
+**Entity Things:**
 * [Entity State](#entity-state)
 * [Entity Relationship](#entity-relationship)
+
+**Entity Interaction:**
 * [Transactional Handler]()
+  * [Declarative]()
+  * [Programmatic]()
+* [Cache]()
 * [Locking]()
-* [Note](#note)
+  * [Pessimistic Locking]()
+  * [Optimistic Locking]()
+
+**Attention to reduce issue:**
 * [Thumbs of rules](#thumbs-of-rules)
+* [Note](#note)
 * [Checklist](#checklist)
 ---
 
