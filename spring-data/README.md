@@ -1,5 +1,5 @@
 # Spring Data
-**_Thumbs of rules:_**
+## Thumbs of rules:
 - 🔒 **See** [POLA](https://en.wikipedia.org/wiki/Principle_of_least_astonishment): 
 
     Which meant for each entity 
