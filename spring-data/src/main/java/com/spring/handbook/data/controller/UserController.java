@@ -1,5 +1,6 @@
 package com.spring.handbook.data.controller;
 
+import com.spring.handbook.data.dto.BaseUserDTO;
 import com.spring.handbook.data.dto.UserDTO;
 import com.spring.handbook.data.entity.User;
 import com.spring.handbook.data.service.UserService;
@@ -20,8 +21,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("{id}")
+    public BaseUserDTO getUser(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
     @GetMapping("save-then-get")
-    public User getUser() {
+    public User saveAndGet() {
         return userService.saveThenGet();
     }
 

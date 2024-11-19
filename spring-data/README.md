@@ -8,9 +8,9 @@
 * [Entity Relationship](#entity-relationship)
 
 **Entity Interaction:**
-* [Transactional Handler]()
-  * [Declarative]()
-  * [Programmatic]()
+* [Transactional Handler](#transaction-handler)
+  * [Declarative](#declarative)
+  * [Programmatic](#programmatic)
 * [Cache]()
 * [Locking]()
   * [Pessimistic Locking]()
@@ -145,6 +145,28 @@ public class Post {
 ```
 
 ---
+## Transaction Handler
+
+### Declarative
+
+Open transaction using `@Transactional`.
+
+### Programmatic
+
+Open transaction using `TransactionTemplate`. Use in case, we have long processing and want to put
+specific step to a transaction context.
+
+### OSIV: Open Session In View
+**_Why do we have OSIV?_**
+
+The idea is when using **LAZY Fetch** we always need to run in transactional context. So
+**OSIV** allow application to use LAZY Fetch without caring about transactional context. 
+
+If **OSIV** is enabled, spring will bind a `EntityManager` to each thread. 
+For read-only, it looks good, but they require `auto-commit` for every statement, 
+it's expensive, we cannot control them.
+
+---
 ## Note:
 
 ### What is N+1 problem?
@@ -222,6 +244,7 @@ To fix that, you need to use `JOIN FETCH`, then they will get them 1 one query.
 - [ ] If **Lazy Fetch**, then you want to get associated entities, please use `@EntityGraphs`, `FETCH JOIN`.
 - [ ] If **Lazy Fetch**, use entity in transactional context.
 - [ ] If **Eager Fetch**, use `FETCH JOIN` when getting data.
+- [ ] Disable OSIV (`spring.jpa.open-in-view=false`)
 
 ---
 

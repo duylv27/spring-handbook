@@ -1,6 +1,7 @@
 package com.spring.handbook.data.service;
 
 import com.spring.handbook.data.dto.AddressDTO;
+import com.spring.handbook.data.dto.BaseUserDTO;
 import com.spring.handbook.data.dto.UserDTO;
 import com.spring.handbook.data.entity.Address;
 import com.spring.handbook.data.entity.User;
@@ -59,7 +60,7 @@ public class UserService {
     @Transactional
     public User saveThenGet() {
         var saveUser = this.saveUser();
-        return getUserById(saveUser.getId());
+        return userRepository.getReferenceById(saveUser.getId());
     }
 
     @Transactional
@@ -75,8 +76,9 @@ public class UserService {
     }
 
     @Transactional
-    public User getUserById(Long userId) {
-        return userRepository.getReferenceById(userId);
+    public BaseUserDTO getUserById(Long userId) {
+        var user = userRepository.getReferenceById(userId);
+        return new BaseUserDTO(user.getId(), user.getFirstName(), null);
     }
 
 }
