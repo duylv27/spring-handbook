@@ -11,7 +11,6 @@ public class UserListener implements PostUpdateEventListener {
 
     @Override
     public void onPostUpdate(PostUpdateEvent postUpdateEvent) {
-        System.out.println();
     }
 
     @Override

@@ -11,7 +11,6 @@
 * [Transactional Handler](#transaction-handler)
   * [Declarative](#declarative)
   * [Programmatic](#programmatic)
-* [Cache]()
 * [Locking]()
   * [Pessimistic Locking]()
   * [Optimistic Locking]()
