@@ -14,6 +14,7 @@ public class FilterConfig {
         registrationBean.setFilter(new DelegatingFilterProxy("appFilter"));
         registrationBean.setOrder(0);
         registrationBean.addUrlPatterns("/*");
+        registrationBean.setEnabled(false);
         return registrationBean;
     }
 
