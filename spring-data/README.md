@@ -248,7 +248,7 @@ To fix that, you need to use `JOIN FETCH`, then they will get them 1 one query.
 ---
 
 ## Thumbs of rules:
-- 🔒 **See** [POLA](https://en.wikipedia.org/wiki/Principle_of_least_astonishment):
+- 🔒 **See GNUN - Give Nothing Until Needed**
 
   Which meant for each entity
   by default it can get its data only (all fetch type should be **LAZY**), in case we want to fetch associated entities,
