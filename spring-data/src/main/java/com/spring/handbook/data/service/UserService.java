@@ -23,12 +23,7 @@ public class UserService {
 
     @Transactional
     public UserDTO update(Long id) {
-        var user = userRepository.findById(id).orElseThrow();
-        user.setFirstName(UUID.randomUUID().toString());
-        user.setLastName(UUID.randomUUID().toString());
-        var address = user.getAddress();
-        AddressDTO addressDTO = new AddressDTO(address.getId(), address.getValue());
-        return new UserDTO(id, user.getFirstName(), user.getLastName(), null, null, addressDTO);
+        return updateInNonTransactionContext(id);
     }
 
     /**
