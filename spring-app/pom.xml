@@ -35,13 +35,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.spring.handbook</groupId>
 			<artifactId>security</artifactId>
 			<version>${security.version}</version>
 		</dependency>
 
+		<!-- Test Dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

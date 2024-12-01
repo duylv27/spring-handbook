@@ -1,8 +1,10 @@
 package com.spring.handbook.data.repository;
 
 import com.spring.handbook.data.entity.User;
+import com.spring.handbook.data.repository.projection.UserProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

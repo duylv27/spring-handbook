@@ -1,6 +1,8 @@
 package com.spring.handbook.security.configuration;
 
-import com.spring.handbook.security.service.UserDetailServiceImpl;
+import com.spring.handbook.security.filter.JWTFilter;
+import com.spring.handbook.security.service.JwtService;
+import com.spring.handbook.security.service.impl.UserDetailServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 
@@ -30,6 +33,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Autowired
+    private JwtService jwtService;
 
     @Autowired
     private UserDetailServiceImpl userDetailService;
@@ -60,6 +66,10 @@ public class SecurityConfig {
                             authorizeHttp.requestMatchers("/public/**").permitAll();
                             authorizeHttp.anyRequest().authenticated();
                         }
+                )
+                .addFilterBefore(
+                        new JWTFilter(jwtService, userDetailService),
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(withDefaults())

@@ -1,5 +1,6 @@
 package com.spring.handbook.app.security;
 
+import com.spring.handbook.app.model.AdminAuthDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -27,6 +28,6 @@ public class AdminAuthProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return true;
+        return AdminAuthDTO.class.isAssignableFrom(authentication);
     }
 }

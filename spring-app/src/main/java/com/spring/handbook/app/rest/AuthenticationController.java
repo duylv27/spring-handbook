@@ -14,7 +14,7 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/public/login")
-    public AuthUserInfoDTO publicResource(
+    public AuthUserInfoDTO authenticate(
             @RequestParam("username") String username,
             @RequestParam("password") String password
     ) {

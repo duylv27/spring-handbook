@@ -4,8 +4,6 @@ import com.spring.handbook.data.configuration.ApplicationConfig;
 import com.spring.handbook.data.entity.Address;
 import com.spring.handbook.data.entity.User;
 import com.spring.handbook.data.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,21 +25,19 @@ import java.util.stream.Stream;
 @Import(ApplicationConfig.class)
 @ExtendWith({OutputCaptureExtension.class})
 @TestPropertySource("classpath:application-test.properties")
-public class UserServiceTest {
+class UserServiceTest {
 
+    public static final String CREATING_NEW_TRANSACTION_LOG = "Creating new transaction with name ";
     private final Logger logger = LoggerFactory.getLogger(UserServiceTest.class);
 
     @Autowired
     private UserService userService;
 
-    @PersistenceContext
-    EntityManager entityManager;
-
     @Autowired
     private UserRepository userRepository;
 
     @AfterEach
-    public synchronized void tearDown() {
+    public void tearDown() {
         userRepository.deleteAll();
     }
 
@@ -53,7 +49,7 @@ public class UserServiceTest {
         // Then
         Assertions.assertNotNull(user);
         String[] logs = output.getOut().split("\r\n");
-        var cnt = Stream.of(logs).filter(line -> line.contains("Creating new transaction with name ")).count();
+        var cnt = Stream.of(logs).filter(line -> line.contains(CREATING_NEW_TRANSACTION_LOG)).count();
         Assertions.assertEquals(1, cnt);
     }
 
@@ -65,7 +61,6 @@ public class UserServiceTest {
         address.setValue("01, LA");
         user.setAddress(address);
         userRepository.save(user);
-        System.out.println("saved user");
 
         // When
         var updatedUser = userService.updateInNonTransactionContext(user.getId());
@@ -73,7 +68,7 @@ public class UserServiceTest {
         // Then
         Assertions.assertNotNull(updatedUser);
         String[] logs = output.getOut().split("\r\n");
-        var cnt = Stream.of(logs).filter(line -> line.contains("Creating new transaction with name ")).count();
+        var cnt = Stream.of(logs).filter(line -> line.contains(CREATING_NEW_TRANSACTION_LOG)).count();
         Assertions.assertEquals(4, cnt);
     }
 
@@ -94,7 +89,7 @@ public class UserServiceTest {
         String[] logs = output.getOut().split("\r\n");
 
         //
-        var cnt = Stream.of(logs).filter(line -> line.contains("Creating new transaction with name ")).count();
+        var cnt = Stream.of(logs).filter(line -> line.contains(CREATING_NEW_TRANSACTION_LOG)).count();
         Assertions.assertEquals(2, cnt);
 
         //
