@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/spring-app/pom.xml" />
         <option value="$PROJECT_DIR$/spring-data/pom.xml" />
         <option value="$PROJECT_DIR$/spring-kafka/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-core/pom.xml" />
       </list>
     </option>
   </component>

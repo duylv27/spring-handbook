@@ -6,8 +6,8 @@ The Spring Handbook serves as a comprehensive guide and collection of notes for 
 ## Reference Documentation
 List of articles:
 
+- [Spring Core](#)
 - [Spring Security](#)
 - [Spring Data JPA](#)
 - [Spring Boot](#)
-- [Spring AOP](#)
-- [Spring MVC](#)
+- [Spring AOP](#) (to be completed)

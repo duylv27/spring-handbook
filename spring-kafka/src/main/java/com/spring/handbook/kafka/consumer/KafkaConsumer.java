@@ -8,9 +8,9 @@ import java.time.Duration;
 @Service
 public class KafkaConsumer {
 
-    @KafkaListener(topics = "topic", groupId = "my-group")
+    @KafkaListener(clientIdPrefix = "KafkaConsumer" , topics = "topic", groupId = "my-group", concurrency = "3")
     public void consume(String message) throws InterruptedException {
-        System.out.println("Hit: " + message);
+        System.out.println("consume: " + message);
         Thread.sleep(Duration.ofSeconds(10));
         System.out.println("Received Message: " + message);
     }
