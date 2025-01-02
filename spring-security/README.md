@@ -1,5 +1,7 @@
 # Spring Security
 
+![img_2.png](overview-flow.png)
+
 ## Introduction
 - Explore basic components that we need to be aware when working with **Spring Security**.
 - Explore components used for custom **Spring Security** for your application.

@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="app" />
+        <module name="core" />
         <module name="security" />
         <module name="data" />
         <module name="kafka" />
@@ -19,6 +20,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="app" options="-parameters" />
+      <module name="core" options="-parameters" />
       <module name="data" options="-parameters" />
       <module name="kafka" options="-parameters" />
       <module name="security" options="-parameters" />
